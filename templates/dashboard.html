@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Risk Manager Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .header {
+            background: #111827;
+            color: white;
+            padding: 25px 7%;
+        }
+
+        .header h1 {
+            font-size: 30px;
+        }
+
+        .header p {
+            margin-top: 7px;
+            color: #cbd5e1;
+        }
+
+        .container {
+            width: 86%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h3 {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .card h2 {
+            margin-top: 12px;
+            font-size: 27px;
+        }
+
+        .section {
+            background: white;
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+        }
+
+        .bar {
+            background: #e5e7eb;
+            height: 25px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 12px 0 20px;
+        }
+
+        .safe {
+            background: #22c55e;
+            height: 100%;
+        }
+
+        .fraud {
+            background: #ef4444;
+            height: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .low {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .high {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        @media (max-width: 850px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 550px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 92%;
+            }
+        }
+        .chart-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.chart-row {
+    display: flex;
+    align-items: center;
+    margin: 18px 0;
+}
+
+.chart-label {
+    width: 160px;
+    font-weight: bold;
+}
+
+.chart-bar {
+    flex: 1;
+    height: 30px;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.chart-safe {
+    height: 100%;
+    background: #22c55e;
+}
+
+.chart-fraud {
+    height: 100%;
+    background: #ef4444;
+}
+.filter-box {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.filter-box input,
+.filter-box select {
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.filter-box input {
+    flex: 1;
+}
+
+@media (max-width: 600px) {
+    .filter-box {
+        flex-direction: column;
+    }
+}
+.fraud-card {
+    border-left: 5px solid #ef4444;
+}
+
+.fraud-card p {
+    margin-top: 8px;
+    color: #64748b;
+    font-size: 13px;
+}
+.history-score {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-bar {
+    width: 80px;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.history-fill {
+    height: 100%;
+    border-radius: 10px;
+}
+
+.high {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.low {
+    color: #16a34a;
+    font-weight: bold;
+}
+.medium {
+    color: #d97706;
+    font-weight: bold;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.summary-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.alert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.high-risk-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fef2f2;
+    border-left: 5px solid #dc2626;
+    padding: 15px 18px;
+    border-radius: 10px;
+}
+
+.high-risk-item p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.alert-score {
+    text-align: right;
+}
+
+.alert-score strong {
+    display: block;
+    font-size: 20px;
+    color: #dc2626;
+}
+
+.alert-score span {
+    font-size: 12px;
+    font-weight: bold;
+    color: #b91c1c;
+}
+
+@media (max-width: 600px) {
+    .high-risk-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .alert-score {
+        text-align: left;
+    }
+}
+
+.summary-card h3 {
+    margin-bottom: 10px;
+}
+
+.summary-card h2 {
+    font-size: 30px;
+    margin: 5px 0;
+}
+
+.summary-card p {
+    color: #64748b;
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.dashboard-header p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.system-status {
+    padding: 10px 15px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+@media (max-width: 700px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.performance-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.performance-card h3 {
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.performance-card h2 {
+    font-size: 26px;
+    margin: 0;
+}
+
+.model-name {
+    margin-top: 15px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+@media (max-width: 800px) {
+    .performance-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .performance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+
+<body>
+<div class="dashboard-header">
+
+    <div>
+        <h1>🛡️ AI Risk Manager</h1>
+        <p>AI-Powered Payment Risk & Fraud Detection System</p>
+    </div>
+
+    <div class="system-status">
+        🟢 AI SYSTEM ACTIVE
+    </div>
+
+</div>
+    <div class="header">
+        <h1>🛡️ AI Risk Manager</h1>
+        <p>Payment Risk & Fraud Detection Dashboard</p>
+    </div>
+
+    <div class="container">
+        <div class="section">
+
+    <h2>📊 Risk Summary</h2>
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+            <h3>🔴 High Risk</h3>
+            <h2>
+                {{ prediction_history
+                   |selectattr("risk", "equalto", "HIGH RISK")
+                   |list
+                   |length }}
+            </h2>
+            <p>Requires immediate action</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>🟠 Medium Risk</h3>
+            <h2>
+                {{ prediction_history
+                   |selectattr("risk", "equalto", "MEDIUM RISK")
+                   |list
+                   |length }}
+            </h2>
+            <p>Requires verification</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>🟢 Low Risk</h3>
+            <h2>
+                {{ prediction_history
+                   |selectattr("risk", "equalto", "LOW RISK")
+                   |list
+                   |length }}
+            </h2>
+            <p>Transaction appears safe</p>
+        </div>
+
+    </div>
+
+</div>
+<div class="section">
+
+    <h2>🤖 AI Model Performance</h2>
+
+    <div class="performance-grid">
+
+        <div class="performance-card">
+            <h3>🎯 Accuracy</h3>
+            <h2>99.95%</h2>
+        </div>
+
+        <div class="performance-card">
+            <h3>🔍 Precision</h3>
+            <h2>90.59%</h2>
+        </div>
+
+        <div class="performance-card">
+            <h3>🚨 Recall</h3>
+            <h2>78.57%</h2>
+        </div>
+
+        <div class="performance-card">
+            <h3>📊 F1 Score</h3>
+            <h2>84.15%</h2>
+        </div>
+
+    </div>
+
+    <p class="model-name">
+        Model Used: <strong>Random Forest Classifier</strong>
+    </p>
+
+</div>
+<div class="section">
+
+    <h2>🚨 High-Risk Transactions</h2>
+
+    {% set high_risk = prediction_history
+        |selectattr("risk", "equalto", "HIGH RISK")
+        |list
+    %}
+
+    {% if high_risk %}
+
+    <div class="alert-list">
+
+        {% for p in high_risk|reverse %}
+
+        <div class="high-risk-item">
+
+            <div>
+                <strong>Transaction #{{ p.transaction_id }}</strong>
+                <p>Amount: ₹{{ "%.2f"|format(p.amount) }}</p>
+            </div>
+
+            <div class="alert-score">
+                <strong>{{ p.risk_score }}/100</strong>
+                <span>🚨 HIGH RISK</span>
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <p>✅ No high-risk transactions detected yet.</p>
+
+    {% endif %}
+
+</div>
+        <div class="section">
+
+    <h2>🤖 AI Prediction History</h2>
+
+    {% if prediction_history %}
+
+    <table>
+
+        <tr>
+            <th>Transaction ID</th>
+            <th>Amount</th>
+            <th>Risk Score</th>
+            <th>Fraud Probability</th>
+            <th>Risk Level</th>
+        </tr>
+
+        {% for p in prediction_history|reverse %}
+
+        <tr>
+            <td>{{ p.transaction_id }}</td>
+            <td>₹{{ "%.2f"|format(p.amount) }}</td>
+            <td>
+    <div class="history-score">
+        <span>{{ p.risk_score }}/100</span>
+
+        <div class="history-bar">
+            <div class="history-fill"
+                 style="width: {{ p.risk_score }}%;
+                 background:
+                 {% if p.risk == "HIGH RISK" %}
+    <span class="high">🔴 HIGH RISK</span>
+
+{% elif p.risk == "MEDIUM RISK" %}
+    <span class="medium">🟠 MEDIUM RISK</span>
+
+{% else %}
+    <span class="low">🟢 LOW RISK</span>
+{% endif %}>
+            </div>
+        </div>
+    </div>
+</td>
+            <td>{{ p.probability }}%</td>
+
+            <td>
+                {% if p.risk == "HIGH RISK" %}
+                    <span class="high">🔴 HIGH RISK</span>
+
+                {% elif p.risk == "MEDIUM RISK" %}
+                    <span style="color:#d97706;font-weight:bold;">
+                        🟠 MEDIUM RISK
+                    </span>
+
+                {% else %}
+                    <span class="low">🟢 LOW RISK</span>
+                {% endif %}
+            </td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+    {% else %}
+
+    <p>No predictions yet. Analyze a transaction to create history.</p>
+
+    {% endif %}
+
+</div>
+    
+        <!-- Dashboard Cards -->
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Transactions</h3>
+                <h2>{{ total }}</h2>
+            </div>
+
+            <div class="card">
+                <h3>Fraud Transactions</h3>
+                <h2>{{ fraud }}</h2>
+            </div>
+
+            <div class="card">
+                <h3>Safe Transactions</h3>
+                <h2>{{ safe }}</h2>
+            </div>
+
+            <div class="card">
+                <h3>Fraud Rate</h3>
+                <h2>{{ fraud_rate }}%</h2>
+            </div>
+
+        </div>
+        <div class="section">
+
+    <h2>📈 Transaction Overview</h2>
+
+    <div class="chart-container">
+
+        <div class="chart-row">
+            <div class="chart-label">Safe</div>
+
+            <div class="chart-bar">
+                <div class="chart-safe"
+                     style="width: {{ safe_rate }}%;">
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-row">
+            <div class="chart-label">Fraud</div>
+
+            <div class="chart-bar">
+                <div class="chart-fraud"
+                     style="width: {{ fraud_rate }}%;">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+        <!-- Risk Distribution -->
+
+        <div class="section">
+
+            <h2>📊 Transaction Risk Distribution</h2>
+
+            <p>Safe Transactions — {{ safe_rate }}%</p>
+<div class="bar">
+    <div class="safe" style="width: {{ safe_rate }}%;"></div>
+</div>
+
+<p>Fraud Transactions — {{ fraud_rate }}%</p>
+<div class="bar">
+    <div class="fraud" style="width: {{ fraud_rate }}%;"></div>
+</div>
+<div class="card fraud-card">
+    <h3>🚨 Fraud Alert</h3>
+    <h2>{{ fraud }}</h2>
+    <p>Suspicious transactions detected</p>
+</div>
+
+        </div>
+
+
+        <!-- Recent Transactions -->
+
+        <div class="section">
+
+            <h2>📋 Recent Transaction Analysis</h2>
+            <div class="filter-box">
+
+    <input
+        type="number"
+        id="transactionSearch"
+        placeholder="🔎 Search Transaction ID..."
+        onkeyup="filterTransactions()"
+    >
+
+    <select id="statusFilter" onchange="filterTransactions()">
+        <option value="all">All Transactions</option>
+        <option value="safe">Safe</option>
+        <option value="fraud">Fraud</option>
+    </select>
+
+</div>
+
+            <table id="transaction Table">
+
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Risk Level</th>
+                </tr>
+
+                {% for t in transactions %}
+
+                <tr>
+
+                    <td>{{ t.Transaction_ID }}</td>
+
+                    <td>₹{{ "%.2f"|format(t.Amount) }}</td>
+
+                    {% if t.Class == 1 %}
+
+                    <td class="high">Fraud Alert</td>
+                    <td class="high">Fraud</td>
+
+                    {% else %}
+
+                    <td class="low">Safe</td>
+                    <td class="low">Low Risk</td>
+
+                    {% endif %}
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+
+    </div>
+<script>
+function filterTransactions() {
+
+    const search =
+        document.getElementById("transactionSearch").value;
+
+    const filter =
+        document.getElementById("statusFilter").value;
+
+    const rows =
+        document.querySelectorAll("#transactionTable tr");
+
+    rows.forEach(function(row, index) {
+
+        if (index === 0) return;
+
+        const id =
+            row.cells[0].innerText;
+
+        const status =
+            row.cells[2].innerText.toLowerCase();
+
+        const idMatch =
+            id.includes(search);
+
+        const statusMatch =
+            filter === "all" ||
+            (filter === "safe" && status.includes("safe")) ||
+            (filter === "fraud" && status.includes("fraud"));
+
+        row.style.display =
+            idMatch && statusMatch ? "" : "none";
+    });
+}
+</script>
+<script>
+    // Automatically refresh dashboard every 10 seconds
+    setTimeout(function () {
+        location.reload();
+    }, 10000);
+</script>
+</body>
+
+</html>
